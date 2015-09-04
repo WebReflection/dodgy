@@ -1,10 +1,17 @@
 {
-  "version": "0.0.0",
+  "version": "1.0.0",
   "license": "MIT",
   "name": "dodgy",
-  "description": "",
+  "description": "Optionally abortable, resolvable, and rejectable promises",
   "homepage": "https://github.com/WebReflection/dodgy",
-  "keywords": [],
+  "keywords": [
+    "Promise",
+    "cancellable",
+    "cancelable",
+    "abort",
+    "lie",
+    "dodgy"
+  ],
   "author": {
     "name": "Andrea Giammarchi",
     "web": "http://webreflection.blogspot.com/"
@@ -15,8 +22,8 @@
   },
   "main": "./build/dodgy.node.js",
   "scripts": {
-    "test": "node test/.test.js||phantomjs testrunner.js",
-    "web": "IP=0.0.0.0 polpetta",
+    "test": "node test/.test.js",
+    "web": "tiny-cdn run",
     "install-global-dev": "node -e '(function(o){for(var k in o)require(\"child_process\").spawn(\"npm\",[\"install\",\"-g\",k+\"@\"+o[k]]).on(\"exit\",console.log.bind(console,k+\"@\"+o[k]));}(require(\"package.json\").globalDevDependencies))'"
   },
   "globalDevDependencies": {

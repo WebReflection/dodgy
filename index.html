@@ -7,8 +7,10 @@
         <meta name="apple-mobile-web-app-capable" content="yes"/>
         <meta names="apple-mobile-web-app-status-bar-style" content="black"/>
         <script>
+        if (!window.Promise)
+          document.write('<script src="//raw.githubusercontent.com/jakearchibald/es6-promise/master/dist/es6-promise.js"><'+'/script>');
         // here the list of tests to run with wru
-        var TESTS = ['main'];
+        var TESTS = ["dodgy"];
         </script>
         <script>// don't change code here
         for(var i = 0; i < TESTS.length; document.write(
