@@ -1,0 +1,2 @@
+/*! (C) Andrea Giammarchi - @WebReflection - Mit Style License */
+var Dodgy=function(){function e(e,n){var r,i,s,o=new Promise(function(t,n){e(t,n,function(o){r=t,i=n,s=function(){i(o.apply(null,arguments))}})});return s?t(o,!!n,r,i,s):o}function t(e,n,r,i,s){function o(o){return function(){return t(o.apply(e,arguments),n,r,i,s)}}return e.then=o(e.then),e["catch"]=o(e["catch"]),e.abort=s,n&&(e.resolve=r,e.reject=i),e}return e}();
