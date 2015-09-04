@@ -5,7 +5,7 @@ The idea behind this module has been explained in [my good old blog](http://webr
 and was [born after the following gist](https://gist.github.com/WebReflection/796d1f04b1173fbcfe5a#file-lie-js) as improved and well tested 30 LOC "_life saver_".
 
 ### How to opt in for .abort([optionalValue])
-In order to be make a promise cancelable we need to invoke the third argument which is a callback expecting to know what to do in case of abort.
+In order to make a promise cancelable we need to invoke the third argument which is a callback expecting to know what to do in case of abortion.
 ```js
 var Dodgy = require('dodgy').Promise;
 
@@ -39,7 +39,7 @@ var p = new Dodgy(
     // passing a "no-op" function, if needed
     optInAbort(Object); // Object would do
   },
-  true  // <- go dodger !!!
+  true  // <- go even dodger !!!
 );
 
 // our p now will have 3 methods:
