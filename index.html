@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Dodgy : Optionally abortable, resolvable, or rejectable promises">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Dodgy</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/WebReflection/dodgy">View on GitHub</a>
+
+          <h1 id="project_title">Dodgy</h1>
+          <h2 id="project_tagline">Optionally abortable, resolvable, or rejectable promises</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/WebReflection/dodgy/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/WebReflection/dodgy/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a id="dodgy-" class="anchor" href="#dodgy-" aria-hidden="true"><span class="octicon octicon-link"></span></a>Dodgy <a href="http://travis-ci.org/WebReflection/dodgy"><img src="https://secure.travis-ci.org/WebReflection/dodgy.svg" alt="build status"></a>
+</h1>
+
+<p>The idea behind this module has been explained in <a href="http://webreflection.blogspot.co.uk/2015/09/on-cancelable-promises.html">my good old blog</a>,
+and was <a href="https://gist.github.com/WebReflection/796d1f04b1173fbcfe5a#file-lie-js">born after the following gist</a> as improved and well tested 30 LOC "<em>life saver</em>".</p>
+
+<h3>
+<a id="how-to-opt-in-for-abortoptionalvalue" class="anchor" href="#how-to-opt-in-for-abortoptionalvalue" aria-hidden="true"><span class="octicon octicon-link"></span></a>How to opt in for .abort([optionalValue])</h3>
+
+<p>In order to be make a promise cancelable we need to invoke the third argument which is a callback expecting to know what to do in case of abort.</p>
+
+<div class="highlight highlight-js"><pre><span class="pl-k">var</span> Dodgy <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>dodgy<span class="pl-pds">'</span></span>).Promise;
+
+<span class="pl-k">var</span> p <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">Dodgy</span>(<span class="pl-k">function</span> (<span class="pl-smi">res</span>, <span class="pl-smi">rej</span>, <span class="pl-smi">onAbort</span>) {
+  <span class="pl-k">var</span> t <span class="pl-k">=</span> <span class="pl-c1">setTimeout</span>(res, <span class="pl-c1">1000</span>, <span class="pl-s"><span class="pl-pds">'</span>OK<span class="pl-pds">'</span></span>);
+  <span class="pl-c1">onAbort</span>(<span class="pl-k">function</span> (<span class="pl-smi">butWhy</span>) {
+    <span class="pl-c1">clearTimeout</span>(t);
+    <span class="pl-k">return</span> butWhy <span class="pl-k">||</span> <span class="pl-s"><span class="pl-pds">'</span>because<span class="pl-pds">'</span></span>;
+  });
+});
+
+p.then(
+  <span class="pl-en">console</span><span class="pl-c1">.log</span>.bind(<span class="pl-en">console</span>),
+  <span class="pl-en">console</span><span class="pl-c1">.warn</span>.bind(<span class="pl-en">console</span>)  <span class="pl-c">// &lt;- .abort()</span>
+).catch(
+  <span class="pl-en">console</span><span class="pl-c1">.error</span>.bind(<span class="pl-en">console</span>)
+);
+
+<span class="pl-c">// at any time later on</span>
+p.<span class="pl-c1">abort</span>(<span class="pl-s"><span class="pl-pds">'</span>not needed anynmore<span class="pl-pds">'</span></span>);
+</pre></div>
+
+<h3>
+<a id="how-to-opt-in-as-externally-resolvable" class="anchor" href="#how-to-opt-in-as-externally-resolvable" aria-hidden="true"><span class="octicon octicon-link"></span></a>How to opt in as externally resolvable</h3>
+
+<p>Canceling a Promise is one thing, resolving it externally is a whole new "<em>dodger</em>" level but we can explicitly opt in if that's needed.</p>
+
+<div class="highlight highlight-js"><pre><span class="pl-k">var</span> p <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">Dodgy</span>(
+  <span class="pl-k">function</span> (<span class="pl-smi">res</span>, <span class="pl-smi">rej</span>, <span class="pl-smi">optInAbort</span>) {
+    <span class="pl-c">// we still need to opt in for abortability</span>
+    <span class="pl-c">// simply invoke the third argument</span>
+    <span class="pl-c">// passing a "no-op" function, if needed</span>
+    optInAbort(<span class="pl-c1">Object</span>); <span class="pl-c">// Object would do</span>
+  },
+  <span class="pl-c1">true</span>  <span class="pl-c">// &lt;- go dodger !!!</span>
+);
+
+<span class="pl-c">// our p now will have 3 methods:</span>
+p.resolve;
+p.reject;
+p.abort;</pre></div>
+
+<p>At this point we can fully control our Promise, proudly riding the edges of nonsense-land!</p>
+
+<h3>
+<a id="chainability" class="anchor" href="#chainability" aria-hidden="true"><span class="octicon octicon-link"></span></a>Chainability</h3>
+
+<p>We can <code>p.then().catch()</code> as much as we like, all control methods will be propagated down the road.</p>
+
+<h3>
+<a id="compatibility" class="anchor" href="#compatibility" aria-hidden="true"><span class="octicon octicon-link"></span></a>Compatibility</h3>
+
+<p>Every browser and JavaScript engine, but the Promise polyfill is not included.
+Try <a href="https://github.com/jakearchibald/es6-promise">es6-promise</a> if you want, it worked for my <a href="http://webreflection.github.io/dodgy/test/">tests on IE8 too</a>.</p>
+
+<h3>
+<a id="which-file" class="anchor" href="#which-file" aria-hidden="true"><span class="octicon octicon-link"></span></a>Which file?</h3>
+
+<p><code>npm install dodgy</code> for modules, <a href="build/">build folder</a> for all other versions.</p>
+
+<h3>
+<a id="which-license" class="anchor" href="#which-license" aria-hidden="true"><span class="octicon octicon-link"></span></a>Which license?</h3>
+
+<p>The MIT style License</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Dodgy maintained by <a href="https://github.com/WebReflection">WebReflection</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
