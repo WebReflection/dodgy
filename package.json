@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "license": "MIT",
   "name": "dodgy",
   "description": "Optionally abortable, resolvable, and rejectable promises",

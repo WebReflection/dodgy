@@ -49,8 +49,31 @@ p.abort;
 ```
 At this point we can fully control our Promise, proudly riding the edges of nonsense-land!
 
+
 ### Chainability
 We can `p.then().catch()` as much as we like, all control methods will be propagated down the road.
+
+### Chaining abortable and resolvable promises
+I believe it is a very bad idea to create alchemy capable of chaining abortaability or resolutions. The resolution per promise can be different per each Promise, and so is the reason to abort. Combine these in a chain would lead to disasters.
+
+Accordingly, if we need to chain multiple abortable Promises, we can return a new one instead, creating points in the chain where abort would make sense.
+
+
+### Multiple abortable/resolvable in the same chain
+The way we could resolve a Promise is different per promise, and so is the reason we might abort.
+I haven't spent much time over-complicating a thing here. If you need to pass along an abortable promise that shuold abort a received one, you are free to create promises like the following:
+```js
+// we have a p1, we return a p2
+return new Dodgy(function (res, rej, onAbort) {
+  // logic to resolve or reject here ... then ...
+  onAbort(function () {
+    // abort previous one
+    p1.abort('from p2');
+    // now abort this one doing whatever is needed
+  });
+});
+```
+
 
 ### Compatibility
 Every browser and JavaScript engine, but the Promise polyfill is not included.
