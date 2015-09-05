@@ -92,5 +92,20 @@ wru.test([
         chain.reject('EPIC FAIL');
       }, 10);
     }
+  },{
+    name: 'multiple abort not invoked',
+    test: function () {
+      var i = 0,  chain = new Dodgy(
+        function (res, rej, onAbort) {
+          onAbort(function () {
+            ++i;
+          });
+        }
+      );
+      chain.abort();
+      chain.abort();
+      wru.log(i);
+      wru.assert('called only once', i === 1);
+    }
   }
 ]);

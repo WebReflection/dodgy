@@ -23,23 +23,23 @@ THE SOFTWARE.
 define(function () {
 function Dodgy(callback, resolvable) {
   var
-    resolve, reject, abort,
+    resolve, reject, abort, done = false,
     dog = new Promise(function (res, rej) {
-      callback(res, rej, function onAbort(callback) {
-        resolve = res;
-        reject = rej;
-        abort = function abort() { reject(callback.apply(null, arguments)); };
-      });
-    })
-  ;
+      callback(
+        resolve = function resolve(how) { done = true; res(how); },
+        reject = function reject(why) { done = true; rej(why); },
+        function onAbort(callback) {
+          abort = function abort(why) {
+            if (!done) reject(callback((done = true) && why));
+          };
+        });
+    });
   return abort ? dodger(dog, !!resolvable, resolve, reject, abort) : dog;
 }
 function dodger(dog, resolvable, resolve, reject, abort) {
   function wrap(previous) {
-    return function () {
-      return dodger(
-        previous.apply(dog, arguments),
-        resolvable, resolve, reject, abort);
+    return function () { return dodger(
+      previous.apply(dog, arguments), resolvable, resolve, reject, abort);
     };
   }
   dog.then = wrap(dog.then);
