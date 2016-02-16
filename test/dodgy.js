@@ -107,5 +107,46 @@ wru.test([
       wru.log(i);
       wru.assert('called only once', i === 1);
     }
+  },{
+    name: 'Dodgy.race with no winner',
+    test: function () {
+      var
+        counter = 0,
+        firstDog = function () { if (++counter > 1) ok(); },
+        secondDog = function () { if (++counter > 1) ok(); },
+        ok = (function () {
+          wru.assert('everything was canceled', counter === 2);
+        })
+      ;
+      Dodgy.race([
+        new Dodgy(function (res, rej, onAbort) {
+          onAbort(firstDog);
+        }),
+        new Dodgy(function (res, rej, onAbort) {
+          onAbort(secondDog);
+        })
+      ]).abort();
+    }
+  } ,{
+    name: 'Dodgy.race with one winner',
+    test: function () {
+      var
+        result = [],
+        a = new Dodgy(function (res, rej, onAbort) {
+          setTimeout(res, 100, 123);
+          onAbort(function () {
+            result.push('a');
+          });
+        }),
+        b = new Dodgy(function (res, rej, onAbort) {
+          onAbort(function () {
+            result.push('b');
+          });
+        }),
+        race = Dodgy.race([a, b]).then(wru.async(function () {
+          wru.assert('b was canceled', result.join('') === 'b');
+        }))
+      ;
+    }
   }
 ]);

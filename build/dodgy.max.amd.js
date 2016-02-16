@@ -51,5 +51,16 @@ function dodger(dog, resolvable, resolve, reject, abort) {
   }
   return dog;
 }
+Dodgy.race = function (iterable) {
+  var dog = Promise.race(iterable).then(abort);
+  function abort(result) {
+    for (var i = 0; i < iterable.length; i++) {
+      if ('abort' in iterable[i]) iterable[i].abort();
+    }
+    return result;
+  }
+  dog.abort = abort;
+  return dog;
+};
 return Dodgy;
 });

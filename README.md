@@ -50,6 +50,22 @@ p.abort;
 At this point we can fully control our Promise, proudly riding the edges of nonsense-land!
 
 
+### Dodgy.race(iterable)
+
+Either one Promise in the iterable solve or the returned dodgy promise is aborted, all other dodgy promises in the iterable will be aborted too.
+
+```js
+var race = Dodgy.race(p1, d2, p3, p4, d5);
+
+// if any of those promises is resolved
+// all abortable will be aborted
+// e.g.  d2.abort(); d5.abort(); will be called
+
+// the same happens if the race itself is aborted
+race.abort();
+```
+
+
 ### Chainability
 We can `p.then().catch()` as much as we like, all control methods will be propagated down the road.
 
