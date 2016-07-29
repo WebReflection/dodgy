@@ -148,5 +148,36 @@ wru.test([
         }))
       ;
     }
+  }, {
+    name: 'Resolvable but not abortable',
+    test: function () {
+      var
+        waitForIt = wru.async(function (v) {
+          wru.assert('expected 2, got ' + v, v === 2);
+          waitForIt = wru.async(function (v) {
+            wru.assert('expected 2, got ' + v, v === 2);
+          });
+          // even after previous trigger
+          // it should keep previous value
+          setTimeout(function () {
+            d.then(waitForIt);
+          }, 200);
+        }),
+        d = new Dodgy(function (res, rej) {
+          // should trigger too late
+          setTimeout(function () {
+            res(1);
+          }, 100);
+        }, true).then(function (v) {
+          waitForIt(v);
+          return v;
+        })
+      ;
+      wru.assert('abort is not set', !d.abort);
+      // should resolve
+      setTimeout(function () {
+        d.resolve(2);
+      }, 10);
+    }
   }
 ]);
