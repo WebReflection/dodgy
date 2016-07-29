@@ -23,33 +23,74 @@ THE SOFTWARE.
 define(function () {
 function Dodgy(callback, resolvable) {
   var
-    resolve, reject, abort, done = false,
+    resolve, reject, abort,
+    status = 'pending',
     dog = new Promise(function (res, rej) {
       callback(
-        resolve = function resolve(how) { done = true; res(how); },
-        reject = function reject(why) { done = true; rej(why); },
+        resolve = function (value) {
+          if (status === 'pending') {
+            status = 'resolved';
+            dog.status = status;
+            res(value);
+          }
+        },
+        reject = function (value) {
+          if (status === 'pending') {
+            status = 'rejected';
+            dog.status = status;
+            rej(value);
+          }
+        },
         function onAbort(callback) {
-          abort = function abort(why) {
-            if (!done) reject(callback((done = true) && why));
+          abort = function (reason) {
+            if (status === 'pending') {
+              status = 'aborted';
+              dog.status = status;
+              rej(callback(reason));
+            }
           };
-        });
-    });
-  return abort ? dodger(dog, !!resolvable, resolve, reject, abort) : dog;
+        }
+      );
+    })
+  ;
+  return evolved(dog, resolvable, abort, resolve, reject);
 }
-function dodger(dog, resolvable, resolve, reject, abort) {
-  function wrap(previous) {
-    return function () { return dodger(
-      previous.apply(dog, arguments), resolvable, resolve, reject, abort);
-    };
-  }
-  dog.then = wrap(dog.then);
-  dog['catch'] = wrap(dog['catch']);
-  dog.abort = abort;
+
+function evolved(dog, resolvable, abort, resolve, reject) {
+  var
+    currentThen = dog.then,
+    currentCatch = dog.catch
+  ;
+  if (abort) dog.abort = abort;
   if (resolvable) {
     dog.resolve = resolve;
     dog.reject = reject;
   }
+  dog.then = function () {
+    return evolved(
+      currentThen.apply(dog, arguments),
+      resolvable, abort, resolve, reject
+    );
+  };
+  dog['catch'] = function () {
+    return evolved(
+      currentCatch.apply(dog, arguments),
+      resolvable, abort, resolve, reject
+    );
+  };
   return dog;
 }
+
+Dodgy.race = function (iterable) {
+  var dog = Promise.race(iterable).then(abort);
+  function abort(result) {
+    for (var i = 0; i < iterable.length; i++) {
+      if ('abort' in iterable[i]) iterable[i].abort();
+    }
+    return result;
+  }
+  dog.abort = abort;
+  return dog;
+};
 return Dodgy;
 });

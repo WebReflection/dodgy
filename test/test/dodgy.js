@@ -107,5 +107,73 @@ wru.test([
       wru.log(i);
       wru.assert('called only once', i === 1);
     }
+  },{
+    name: 'Dodgy.race with no winner',
+    test: function () {
+      var
+        counter = 0,
+        firstDog = function () { if (++counter > 1) ok(); },
+        secondDog = function () { if (++counter > 1) ok(); },
+        ok = (function () {
+          wru.assert('everything was canceled', counter === 2);
+        })
+      ;
+      Dodgy.race([
+        new Dodgy(function (res, rej, onAbort) {
+          onAbort(firstDog);
+        }),
+        new Dodgy(function (res, rej, onAbort) {
+          onAbort(secondDog);
+        })
+      ]).abort();
+    }
+  } ,{
+    name: 'Dodgy.race with one winner',
+    test: function () {
+      var
+        result = [],
+        a = new Dodgy(function (res, rej, onAbort) {
+          setTimeout(res, 100, 123);
+          onAbort(function () {
+            result.push('a');
+          });
+        }),
+        b = new Dodgy(function (res, rej, onAbort) {
+          onAbort(function () {
+            result.push('b');
+          });
+        }),
+        race = Dodgy.race([a, b]).then(wru.async(function () {
+          wru.assert('b was canceled', result.join('') === 'b');
+        }))
+      ;
+    }
+  }, {
+    name: 'Resolvable but not abortable',
+    test: function () {
+      var
+        d = new Dodgy(function (res, rej) {
+          // should trigger too late
+          setTimeout(function () {
+            res(1);
+          }, 100);
+        }, true).then(wru.async(function (v) {
+          wru.assert('expected 2, got ' + v, v === 2);
+          setTimeout(wru.async(function (v) {
+            wru.assert('OK');
+            d.then(wru.async(function (v) {
+              wru.assert('expected 2, got ' + v, v === 2);
+              return v;
+            }));
+          }), 200);
+          return v;
+        }))
+      ;
+      wru.assert('abort is not set', !d.abort);
+      // should resolve
+      setTimeout(function () {
+        d.resolve(2);
+      }, 10);
+    }
   }
 ]);
