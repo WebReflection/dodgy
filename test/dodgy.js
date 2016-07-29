@@ -152,26 +152,22 @@ wru.test([
     name: 'Resolvable but not abortable',
     test: function () {
       var
-        waitForIt = wru.async(function (v) {
-          wru.assert('expected 2, got ' + v, v === 2);
-          waitForIt = wru.async(function (v) {
-            wru.assert('expected 2, got ' + v, v === 2);
-          });
-          // even after previous trigger
-          // it should keep previous value
-          setTimeout(function () {
-            d.then(waitForIt);
-          }, 200);
-        }),
         d = new Dodgy(function (res, rej) {
           // should trigger too late
           setTimeout(function () {
             res(1);
           }, 100);
-        }, true).then(function (v) {
-          waitForIt(v);
+        }, true).then(wru.async(function (v) {
+          wru.assert('expected 2, got ' + v, v === 2);
+          setTimeout(wru.async(function (v) {
+            wru.assert('OK');
+            d.then(wru.async(function (v) {
+              wru.assert('expected 2, got ' + v, v === 2);
+              return v;
+            }));
+          }), 200);
           return v;
-        })
+        }))
       ;
       wru.assert('abort is not set', !d.abort);
       // should resolve
