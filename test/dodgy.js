@@ -1,5 +1,5 @@
 //remove:
-var Dodgy = require('../build/dodgy.node.js');
+var Dodgy = require('../cjs').default;
 //:remove
 
 wru.test([
