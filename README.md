@@ -4,6 +4,10 @@ Dodgy [![build status](https://secure.travis-ci.org/WebReflection/dodgy.svg)](ht
 The idea behind this module has been explained in [my good old blog](http://webreflection.blogspot.co.uk/2015/09/on-cancelable-promises.html),
 and was [born after the following gist](https://gist.github.com/WebReflection/796d1f04b1173fbcfe5a#file-lie-js) as improved and well tested 30 LOC "_life saver_".
 
+* CDN global utility via https://unpkg.com/dodgy
+* ESM via `import {Dodgy} from 'dodgy'`
+* CJS via `const {Dodgy} = require('dodgy')`
+
 ### How to opt in for .abort([optionalValue])
 In order to make a promise cancelable we need to invoke the third argument which is a callback expecting to know what to do in case of abortion.
 ```js
@@ -94,9 +98,6 @@ return new Dodgy(function (res, rej, onAbort) {
 ### Compatibility
 Every browser and JavaScript engine, but the Promise polyfill is not included.
 Try [es6-promise](https://github.com/jakearchibald/es6-promise) if you want, it worked for my [tests on IE8 too](http://webreflection.github.io/dodgy/test/).
-
-### Which file?
-`npm install dodgy` for modules, [build folder](build/) for all other versions.
 
 ### Which license?
 The MIT style License
