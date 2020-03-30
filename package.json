@@ -1,6 +1,6 @@
 {
   "name": "dodgy",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Optionally abortable, resolvable, and rejectable promises",
   "main": "./cjs/index.js",
   "module": "./esm/index.js",
