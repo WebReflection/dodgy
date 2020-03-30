@@ -15,9 +15,9 @@ function exit($code) {
   if (!--many) {
     if (!code) {
       fs.writeFileSync(
-        path.join(__dirname, '..', 'index.html'),
+        path.join(__dirname, 'index.html'),
         fs.readFileSync(
-          path.join(__dirname, '..', 'index.html'),
+          path.join(__dirname, 'index.html'),
           'utf-8'
         ).replace(/var TESTS = \[.*?\];/, 'var TESTS = ' + JSON.stringify(tests) + ';'),
         'utf-8'
@@ -28,7 +28,7 @@ function exit($code) {
 }
 
 fs.readdirSync(__dirname).filter(function(file){
-  if (ext.test(file) && (fs.existsSync || path.existsSync)(path.join(__dirname, '..', 'src', file))) {
+  if (ext.test(file) && (fs.existsSync || path.existsSync)(path.join(__dirname, '..', 'cjs', file))) {
     ++many;
     tests.push(file.replace(ext, ''));
     spawn(

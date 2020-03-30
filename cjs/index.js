@@ -1,3 +1,4 @@
+'use strict';
 function Dodgy(callback, resolvable) {
   var
     resolve, reject, abort,
@@ -69,3 +70,6 @@ Dodgy.race = function (iterable) {
   dog.abort = abort;
   return dog;
 };
+
+Object.defineProperty(exports, '__esModule', {value: true}).default = Dodgy;
+exports.Dodgy = Dodgy;
