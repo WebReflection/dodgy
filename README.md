@@ -7,7 +7,7 @@ and was [born after the following gist](https://gist.github.com/WebReflection/79
 ### How to opt in for .abort([optionalValue])
 In order to make a promise cancelable we need to invoke the third argument which is a callback expecting to know what to do in case of abortion.
 ```js
-var Dodgy = require('dodgy').Promise;
+import {Dodgy} from 'dodgy';
 
 var p = new Dodgy(function (res, rej, onAbort) {
   var t = setTimeout(res, 1000, 'OK');
